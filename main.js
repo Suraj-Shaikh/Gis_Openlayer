@@ -17,36 +17,36 @@ var osmTile = new ol.layer.Tile({
 map.addLayer(osmTile);
 
 // NBSS AWC Layer
-var nbssAWCData = new ol.layer.Tile({
-  title: "Soil AWC",
-  source: new ol.source.TileWMS({
-    url: "http://localhost:8080/geoserver/postgres/wms",
-    params: {
-      LAYERS: "postgres:soil_data_nbss_layer",
-      STYLES: "soil_AWC",
-      TILED: true,
-    },
-    serverType: "geoserver",
-  }),
-});
+// var nbssAWCData = new ol.layer.Tile({
+//   title: "Soil AWC",
+//   source: new ol.source.TileWMS({
+//     url: "http://localhost:8080/geoserver/postgres/wms",
+//     params: {
+//       LAYERS: "postgres:soil_data_nbss_layer",
+//       STYLES: "soil_AWC",
+//       TILED: true,
+//     },
+//     serverType: "geoserver",
+//   }),
+// });
 
-map.addLayer(nbssAWCData);
+// map.addLayer(nbssAWCData);
 
-// NBSS AWC Layer
-var nbssSDData = new ol.layer.Tile({
-  title: "Soil Depth",
-  source: new ol.source.TileWMS({
-    url: "http://localhost:8080/geoserver/postgres/wms",
-    params: {
-      LAYERS: "postgres:soil_data_nbss_layer",
-      STYLES: "soil_SD",
-      TILED: true,
-    },
-    serverType: "geoserver",
-  }),
-});
+// // NBSS AWC Layer
+// var nbssSDData = new ol.layer.Tile({
+//   title: "Soil Depth",
+//   source: new ol.source.TileWMS({
+//     url: "http://localhost:8080/geoserver/postgres/wms",
+//     params: {
+//       LAYERS: "postgres:soil_data_nbss_layer",
+//       STYLES: "soil_SD",
+//       TILED: true,
+//     },
+//     serverType: "geoserver",
+//   }),
+// });
 
-map.addLayer(nbssSDData);
+// map.addLayer(nbssSDData);
 
 var nbssOCData = new ol.layer.Tile({
   title: "Soil Organic Carbon",
@@ -79,7 +79,7 @@ var nbssTextureData = new ol.layer.Tile({
 map.addLayer(nbssTextureData);
 
 var nbsbBidVillData = new ol.layer.Tile({
-  title: "MH_Villages",
+  title: "Bid Villages",
   source: new ol.source.TileWMS({
     url: "http://localhost:8080/geoserver/postgres/wms",
     params: {
@@ -93,20 +93,23 @@ var nbsbBidVillData = new ol.layer.Tile({
 
 map.addLayer(nbsbBidVillData);
 
-// var layerSwitcher = new ol.control.layerSwitcher({
-//   activationMode: 'click',
-//   startActive: true,
-//   groupSelectStyle: "children",
-// });
 
-// map.addControl(layerSwitcher);
+// var layerSwitcher = new LayerSwitcher({
+//     activationMode: 'click',
+//     startActive: true,
+//     groupSelectStyle: "children",
+//   });
 
+//   map.addControl(layerSwitcher);
 
-var layerSwitcher = new LayerSwitcher({
-    activationMode: 'click',
-    startActive: true,
-    groupSelectStyle: "children",
-  });
-  
-  map.addControl(layerSwitcher);
-  
+function toggleLayer(eve){
+  var larname = eve.target.value;
+  var checkedStatus = eve.target.checked;
+  var larList = map.getLayers();
+
+  larList.forEach(function(element){
+    if(larname == element.get('title')){
+      element.setVisible(checkedStatus);
+    }
+  })
+}

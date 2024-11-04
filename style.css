@@ -4,9 +4,39 @@ body{
     overflow: hidden;
 }
 #map{
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.header{
+    grid-area: header;
+    font-size: 25px;
+    height: 50px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.grid-container{
+    display: grid;
+    grid-template-areas:
+    'header header'
+    'left right';
+}
+
+.left{
+    grid-area: left;
+    width: 20vw;
+    height: 100vh;
+    border: 5px solid gray;
+}
+
+.toc{
+    margin-left: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.right{
+    grid-area: right;
+    width: 80vw;
+    height: 100vh;
+    border: 5px solid gray;
 }
