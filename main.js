@@ -1,11 +1,16 @@
 window.onload = populateDistrictDropdown;
-function initMap(distCode) {
+
+var map;
+var nbssOCData, nbssAWCData, nbssSDData, nbssTextureData, nbsbBidVillData;
+
+// Initialize the map and layers
+function initMap() {
   var mapView = new ol.View({
     center: ol.proj.fromLonLat([76.994967, 20.702250]),
     zoom: 10,
   });
 
-  var map = new ol.Map({
+  map = new ol.Map({
     target: "map",
     view: mapView,
   });
@@ -18,39 +23,24 @@ function initMap(distCode) {
 
   map.addLayer(osmTile);
 
-  // NBSS AWC Layer
-  // var nbssAWCData = new ol.layer.Tile({
-  //   title: "Soil AWC",
-  //   source: new ol.source.TileWMS({
-  //     url: "http://localhost:8080/geoserver/postgres/wms",
-  //     params: {
-  //       LAYERS: "postgres:soil_data_nbss_layer",
-  //       STYLES: "soil_AWC",
-  //       TILED: true,
-  //     },
-  //     serverType: "geoserver",
-  //   }),
-  // });
+  // NBSS Soil AWC Layer
+  nbssAWCData = new ol.layer.Tile({
+    title: "Soil AWC",
+    source: new ol.source.TileWMS({
+      url: "http://localhost:8080/geoserver/postgres/wms",
+      params: {
+        LAYERS: "postgres:nbss_all_soil_data",
+        STYLES: "NBSS_AWC_class",
+        TILED: true,
+        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+      },
+      serverType: "geoserver",
+    }),
+  });
+  map.addLayer(nbssAWCData);
 
-  // map.addLayer(nbssAWCData);
-
-  // // NBSS AWC Layer
-  // var nbssSDData = new ol.layer.Tile({
-  //   title: "Soil Depth",
-  //   source: new ol.source.TileWMS({
-  //     url: "http://localhost:8080/geoserver/postgres/wms",
-  //     params: {
-  //       LAYERS: "postgres:nbss_all_soil_data",
-  //       STYLES: "soil_SD",
-  //       TILED: true,
-  //     },
-  //     serverType: "geoserver",
-  //   }),
-  // });
-
-  // map.addLayer(nbssSDData);
-
-  var nbssOCData = new ol.layer.Tile({
+  // Initialize NBSS Soil Organic Carbon Layer
+  nbssOCData = new ol.layer.Tile({
     title: "Soil Organic Carbon",
     source: new ol.source.TileWMS({
       url: "http://localhost:8080/geoserver/postgres/wms",
@@ -58,43 +48,88 @@ function initMap(distCode) {
         LAYERS: "postgres:nbss_all_soil_data",
         STYLES: "NBSS_OC_class",
         TILED: true,
-        viewparams: `dtncode:${distCode}`, // Use distCode directly
+        viewparams: `dtncode:0`, // Default viewparams; updated on district change
       },
       serverType: "geoserver",
     }),
   });
 
   map.addLayer(nbssOCData);
+
+  
+
+  // NBSS Soil Depth Layer
+  nbssSDData = new ol.layer.Tile({
+    title: "Soil Depth",
+    source: new ol.source.TileWMS({
+      url: "http://localhost:8080/geoserver/postgres/wms",
+      params: {
+        LAYERS: "postgres:nbss_all_soil_data",
+        STYLES: "NBSS_Depth_class",
+        TILED: true,
+        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+      },
+      serverType: "geoserver",
+    }),
+  });
+  map.addLayer(nbssSDData);
+
+  // NBSS Soil Texture Layer
+  nbssTextureData = new ol.layer.Tile({
+    title: "Soil Texture",
+    source: new ol.source.TileWMS({
+      url: "http://localhost:8080/geoserver/postgres/wms",
+      params: {
+        LAYERS: "postgres:nbss_all_soil_data",
+        STYLES: "NBSS_Texture_class",
+        TILED: true,
+        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+      },
+      serverType: "geoserver",
+    }),
+  });
+  map.addLayer(nbssTextureData);
+
+  // Bid Villages Layer
+  nbsbBidVillData = new ol.layer.Tile({
+    title: "Bid Villages",
+    source: new ol.source.TileWMS({
+      url: "http://localhost:8080/geoserver/postgres/wms",
+      params: {
+        LAYERS: "postgres:nbss_all_soil_data",
+        STYLES: "mh_villages_sld",
+        TILED: true,
+        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+      },
+      serverType: "geoserver",
+    }),
+  });
+  map.addLayer(nbsbBidVillData);
 }
-// var nbssTextureData = new ol.layer.Tile({
-//   title: "Soil Texture",
-//   source: new ol.source.TileWMS({
-//     url: "http://localhost:8080/geoserver/postgres/wms",
-//     params: {
-//       LAYERS: "postgres:nbss_all_soil_data",
-//       STYLES: "soil_Texture",
-//       TILED: true,
-//     },
-//     serverType: "geoserver",
-//   }),
-// });
 
-// map.addLayer(nbssTextureData);
+// Update the layer's viewparams when district changes
+function updateLayer(distCode) {
+  // Update viewparams for each layer dynamically based on district code
+  nbssOCData.getSource().updateParams({
+    viewparams: `dtncode:${distCode}`,
+  });
 
-// var nbsbBidVillData = new ol.layer.Tile({
-//   title: "Bid Villages",
-//   source: new ol.source.TileWMS({
-//     url: "http://localhost:8080/geoserver/postgres/wms",
-//     params: {
-//       LAYERS: "postgres:nbss_all_soil_data",
-//       STYLES: "mh_villages_sld",
-//       TILED: true,
-//     },
-//     serverType: "geoserver",
-//   }),
-// });
+  nbssAWCData.getSource().updateParams({
+    viewparams: `dtncode:${distCode}`,
+  });
 
-// map.addLayer(nbsbBidVillData);
+  nbssSDData.getSource().updateParams({
+    viewparams: `dtncode:${distCode}`,
+  });
+
+  nbssTextureData.getSource().updateParams({
+    viewparams: `dtncode:${distCode}`,
+  });
+
+  nbsbBidVillData.getSource().updateParams({
+    viewparams: `dtncode:${distCode}`,
+  });
+}
 
 
 // var layerSwitcher = new LayerSwitcher({
@@ -117,27 +152,18 @@ function toggleLayer(eve) {
     }
   })
 }
-
-const distCode = document.getElementById("districtDropdown").value;
-
-// create dropdown FOR District selection
+// Populate district dropdown
 async function populateDistrictDropdown() {
   try {
-    // Fetch district data from API
     const response = await fetch("http://127.0.0.1:5000/get_all_districts");
     const data = await response.json();
-
-    // Get the dropdown element
     const districtDropdown = document.getElementById("districtDropdown");
 
-    // Clear existing options except default
     districtDropdown.innerHTML = "<option>Select District</option>";
-
-    // Populate dropdown with district names
     data.forEach((district) => {
       const option = document.createElement("option");
-      option.value = district.dtncode; // Set value as district code
-      option.textContent = district.dtname; // Set displayed name
+      option.value = district.dtncode;
+      option.textContent = district.dtname;
       districtDropdown.appendChild(option);
     });
   } catch (error) {
@@ -145,17 +171,14 @@ async function populateDistrictDropdown() {
   }
 }
 
-//create dropdown for Taluka selection
-
+// Populate taluka dropdown based on selected district
 async function populateTalukaDropdown(districtCode) {
   try {
     const response = await fetch(`http://127.0.0.1:5000/get_talukas/${districtCode}`);
     const data = await response.json();
-
     const talukaDropdown = document.getElementById("talukaDropdown");
 
     talukaDropdown.innerHTML = "<option>Select Taluka</option>";
-
     data.forEach((taluka) => {
       const option = document.createElement("option");
       option.value = taluka.thncode;
@@ -167,41 +190,40 @@ async function populateTalukaDropdown(districtCode) {
   }
 }
 
-document.getElementById("districtDropdown").addEventListener("change", (event) => {
-  const selectDistrict = event.target.value;
-  const distCode = selectDistrict;
-  populateTalukaDropdown(distCode);
-  initMap(distCode)
-});
-
-// create dropdown for Village selection
+// Populate village dropdown based on selected district and taluka
 async function populateVillageDropdown(distCode, talukaCode) {
   try {
     const response = await fetch(`http://127.0.0.1:5000/get_villages/${distCode}/${talukaCode}`);
     const data = await response.json();
-
     const villageDropdown = document.getElementById("villageDropdown");
 
     villageDropdown.innerHTML = "<option>Select Village</option>";
-
-
     data.forEach((village) => {
-      console.log(village);
       const option = document.createElement("option");
       option.value = village.vincode;
       option.textContent = village.vlname;
       villageDropdown.appendChild(option);
-    })
-
+    });
   } catch (error) {
     console.error("Error fetching village data:", error);
   }
 }
 
+// Event listener for district dropdown change
+document.getElementById("districtDropdown").addEventListener("change", (event) => {
+  const distCode = event.target.value;
+  populateTalukaDropdown(distCode);
+  updateLayer(distCode);  // Update layers based on selected district
+});
+
+// Event listener for taluka dropdown change
 document.getElementById("talukaDropdown").addEventListener("change", (event) => {
   const talukaCode = event.target.value;
   const distCode = document.getElementById("districtDropdown").value;
   populateVillageDropdown(distCode, talukaCode);
-
 });
 
+
+
+// Initialize map on page load
+initMap();
