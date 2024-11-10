@@ -56,7 +56,7 @@ function initMap() {
 
   map.addLayer(nbssOCData);
 
-  
+
 
   // NBSS Soil Depth Layer
   nbssSDData = new ol.layer.Tile({
@@ -209,11 +209,47 @@ async function populateVillageDropdown(distCode, talukaCode) {
   }
 }
 
+// Define the function to zoom and pan to a specific extent
+function zoomToExtent(extent) {
+  var view = map.getView();
+  view.fit(extent, {
+    size: map.getSize(),  // Fit to the current map size
+    maxZoom: 12,          // Optional: Maximum zoom level
+  });
+}
+
+async function getDistrictExtent(distCode) {
+  try {
+    // Fetch extent from API
+    const response = await fetch(`http://127.0.0.1:5000/get_all_districts/${distCode}`);
+    const data = await response.json();
+    console.log(data);
+
+    // Assuming the API returns an array of districts and each district has a "extent" string
+    const district = data[0];  // Get the first district, assuming data is an array
+    const extentString = district.extent;  // Example: "76.20712134300001, 18.749738211000057, 77.192660942, 19.83061516700011"
+    
+    // Split the extent string into individual coordinates
+    const extentArray = extentString.split(', ').map(coord => parseFloat(coord));
+
+    // Transform the extent from EPSG:4326 (WGS84) to EPSG:3857 (Web Mercator)
+    const extent = ol.proj.transformExtent(extentArray, 'EPSG:4326', 'EPSG:3857');
+    
+    // Zoom to the extent
+    zoomToExtent(extent);
+    console.log(extent);
+  } catch (error) {
+    console.error("Error fetching district extent:", error);
+  }
+}
+
+
 // Event listener for district dropdown change
 document.getElementById("districtDropdown").addEventListener("change", (event) => {
   const distCode = event.target.value;
   populateTalukaDropdown(distCode);
   updateLayer(distCode);  // Update layers based on selected district
+  getDistrictExtent(distCode); // Zoom to district extent
 });
 
 // Event listener for taluka dropdown change
