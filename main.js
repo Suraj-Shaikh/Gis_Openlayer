@@ -34,7 +34,7 @@ function initMap() {
         LAYERS: "postgres:nbss_all_soil_data",
         STYLES: "NBSS_AWC_class",
         TILED: true,
-        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+        viewparams: `dtncode:0;thncode:0;vincode:0`, // Default viewparams; updated on district change
       },
       serverType: "geoserver",
     }),
@@ -50,15 +50,13 @@ function initMap() {
         LAYERS: "postgres:nbss_all_soil_data",
         STYLES: "NBSS_OC_class",
         TILED: true,
-        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+        viewparams: `dtncode:0;thncode:0;vincode:0`, // Default viewparams; updated on district change
       },
       serverType: "geoserver",
     }),
   });
 
   map.addLayer(nbssOCData);
-
-
 
   // NBSS Soil Depth Layer
   nbssSDData = new ol.layer.Tile({
@@ -69,7 +67,7 @@ function initMap() {
         LAYERS: "postgres:nbss_all_soil_data",
         STYLES: "NBSS_Depth_class",
         TILED: true,
-        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+        viewparams: `dtncode:0;thncode:0;vincode:0`, // Default viewparams; updated on district change
       },
       serverType: "geoserver",
     }),
@@ -85,7 +83,7 @@ function initMap() {
         LAYERS: "postgres:nbss_all_soil_data",
         STYLES: "NBSS_Texture_class",
         TILED: true,
-        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+        viewparams: `dtncode:0;thncode:0;vincode:0`, // Default viewparams; updated on district change
       },
       serverType: "geoserver",
     }),
@@ -101,7 +99,7 @@ function initMap() {
         LAYERS: "postgres:nbss_all_soil_data",
         STYLES: "mh_villages_sld",
         TILED: true,
-        viewparams: `dtncode:0`, // Default viewparams; updated on district change
+        viewparams: `dtncode:0;thncode:0;vincode:0`, // Default viewparams; updated on district change
       },
       serverType: "geoserver",
     }),
@@ -110,37 +108,30 @@ function initMap() {
 }
 
 // Update the layer's viewparams when district changes
-function updateLayer(distCode) {
+function updateLayer(distCode= null,thncode= null,vincode= null) {
+  var _viewParams = `dtncode:${distCode};thncode:${thncode};vincode:${vincode};`;
   // Update viewparams for each layer dynamically based on district code
   nbssOCData.getSource().updateParams({
-    viewparams: `dtncode:${distCode}`,
+    viewparams: `dtncode:${distCode};thncode:${thncode};vincode:${vincode}`,
   });
-
+// dtncode:523;thncode:4222;vincode:559695
   nbssAWCData.getSource().updateParams({
-    viewparams: `dtncode:${distCode}`,
+    'VIEWPARAMS': _viewParams
   });
 
   nbssSDData.getSource().updateParams({
-    viewparams: `dtncode:${distCode}`,
+    'VIEWPARAMS': _viewParams
   });
 
   nbssTextureData.getSource().updateParams({
-    viewparams: `dtncode:${distCode}`,
+    'VIEWPARAMS': _viewParams
   });
 
   nbsbBidVillData.getSource().updateParams({
-    viewparams: `dtncode:${distCode}`,
+    'VIEWPARAMS': _viewParams
   });
 }
 
-
-// var layerSwitcher = new LayerSwitcher({
-//     activationMode: 'click',
-//     startActive: true,
-//     groupSelectStyle: "children",
-//   });
-
-//   map.addControl(layerSwitcher);
 
 // checkbox status
 function toggleLayer(eve) {
@@ -254,6 +245,7 @@ document.getElementById("districtDropdown").addEventListener("change", (event) =
 document.getElementById("talukaDropdown").addEventListener("change", (event) => {
   const talukaCode = event.target.value;
   const distCode = document.getElementById("districtDropdown").value;
+  updateLayer(distCode,talukaCode)
   populateVillageDropdown(distCode, talukaCode);
 });
 
