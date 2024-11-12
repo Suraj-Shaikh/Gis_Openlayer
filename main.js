@@ -6,13 +6,15 @@ var nbssOCData, nbssAWCData, nbssSDData, nbssTextureData, nbsbBidVillData;
 // Initialize the map and layers
 function initMap() {
   var mapView = new ol.View({
-    center: ol.proj.fromLonLat([76.994967, 20.702250]),
+    center: [76.994967, 20.702250],
     zoom: 10,
+    projection: "EPSG:4326",
   });
 
   map = new ol.Map({
     target: "map",
     view: mapView,
+    
   });
 
   var osmTile = new ol.layer.Tile({
@@ -223,21 +225,17 @@ async function getDistrictExtent(distCode) {
     // Fetch extent from API
     const response = await fetch(`http://127.0.0.1:5000/get_all_districts/${distCode}`);
     const data = await response.json();
-    console.log(data);
-
+  
     // Assuming the API returns an array of districts and each district has a "extent" string
     const district = data[0];  // Get the first district, assuming data is an array
     const extentString = district.extent;  // Example: "76.20712134300001, 18.749738211000057, 77.192660942, 19.83061516700011"
     
     // Split the extent string into individual coordinates
     const extentArray = extentString.split(', ').map(coord => parseFloat(coord));
-
-    // Transform the extent from EPSG:4326 (WGS84) to EPSG:3857 (Web Mercator)
-    const extent = ol.proj.transformExtent(extentArray, 'EPSG:4326', 'EPSG:3857');
     
     // Zoom to the extent
-    zoomToExtent(extent);
-    console.log(extent);
+    zoomToExtent(extentArray);
+    // console.log(extentArray);
   } catch (error) {
     console.error("Error fetching district extent:", error);
   }
